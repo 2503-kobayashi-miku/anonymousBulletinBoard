@@ -63,7 +63,7 @@ public class ReportService {
         reportRepository.deleteById(id);
     }
 
-    public ReportForm editReport(Integer id) {
+    public ReportForm selectReport(Integer id) {
         List<Report> results = new ArrayList<>();
         results.add((Report)reportRepository.findById(id).orElse(null));
         List<ReportForm> reports = setReportForm(results);

@@ -1,5 +1,6 @@
 package com.example.forum.controller;
 
+import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,16 +67,57 @@ public class ForumController {
     }
 
     /*
-     * 投稿編集処理
+     * 投稿編集画面表示処理
      */
     @GetMapping("/edit/{id}")
     public ModelAndView editContent(@PathVariable Integer id){
         ModelAndView mav = new ModelAndView();
 
-        ReportForm report = reportService.editReport(id);
+        ReportForm report = reportService.selectReport(id);
 
         mav.addObject("formModel", report);
         mav.setViewName("/edit");
         return mav;
+    }
+
+    /*
+     * 投稿編集処理
+     */
+    @PutMapping("/update/{id}")
+    public ModelAndView updateContent(@ModelAttribute("formModel") ReportForm report){
+        reportService.saveReport(report);
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * コメント投稿画面表示
+     */
+    @GetMapping("/comment/{id}")
+    public ModelAndView newComment(@PathVariable Integer id) {
+        ModelAndView mav = new ModelAndView();
+        // form用の空のentityを準備
+        CommentForm commentForm = new CommentForm();
+        //コメントする投稿を取得
+        ReportForm content = reportService.selectReport(id);
+        // 準備した空のFormを保管
+        mav.addObject("commentFormModel", commentForm);
+        // 取得したコメント先の投稿を保管
+        mav.addObject("content", content);
+        // 画面遷移先を指定
+        mav.setViewName("/comment");
+
+        return mav;
+    }
+
+    /*
+     * 新規コメント投稿処理
+     */
+    @PostMapping("/comment/{id}")
+    public ModelAndView addComment(@PathVariable Integer id,
+                                   @ModelAttribute("commentFormModel") CommentForm commentForm){
+        // 投稿をテーブルに格納
+        reportService.saveComment(commentForm);
+        // rootへリダイレクト
+        return new ModelAndView("redirect:/");
     }
 }
