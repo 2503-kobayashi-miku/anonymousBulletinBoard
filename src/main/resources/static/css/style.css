@@ -130,3 +130,7 @@ label {
 	margin-left: 10px;
 	color: red;
 }
+
+.comment {
+    text-indent: 1em;
+}

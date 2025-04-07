@@ -8,6 +8,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class CommentForm {
+
     private int id;
     private String content;
     private int reportId;

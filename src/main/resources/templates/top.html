@@ -35,6 +35,19 @@
                 <input type="submit" value="コメント">
             </form>
         </div>
+        <div class="comment" th:each="comment : ${comments}">
+            <div th:if="${comment.reportId == content.id}">
+                <div class="text">
+                    投稿 : <span th:text="${comment.content}"/>
+                </div>
+                <div class="edit-button">
+                    <a th:href="@{/edit-comment/{id}(id=${comment.id})}">
+                        <input type="button" value="編集">
+                    </a>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 </body>

@@ -2,6 +2,7 @@ package com.example.forum.controller;
 
 import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
+import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,9 @@ import java.util.List;
 public class ForumController {
     @Autowired
     ReportService reportService;
+    @Autowired
+    CommentService commentService;
+    private Integer reportId;
 
     /*
      * 投稿内容表示処理
@@ -23,10 +27,12 @@ public class ForumController {
         ModelAndView mav = new ModelAndView();
         // 投稿を全件取得
         List<ReportForm> contentData = reportService.findAllReport();
+        List<CommentForm> commentData = commentService.findAllComment();
         // 画面遷移先を指定
         mav.setViewName("/top");
         // 投稿データオブジェクトを保管
         mav.addObject("contents", contentData);
+        mav.addObject("comments", commentData);
         return mav;
     }
 
@@ -115,9 +121,35 @@ public class ForumController {
     @PostMapping("/comment/{id}")
     public ModelAndView addComment(@PathVariable Integer id,
                                    @ModelAttribute("commentFormModel") CommentForm commentForm){
+        commentForm.setReportId(id);
         // 投稿をテーブルに格納
-        reportService.saveComment(commentForm);
+        commentService.saveComment(commentForm);
         // rootへリダイレクト
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * コメント編集画面表示
+     */
+    @GetMapping("/edit-comment/{id}")
+    public ModelAndView editComment(@PathVariable Integer id){
+        ModelAndView mav = new ModelAndView();
+        //編集するコメントを取得
+        CommentForm comment = commentService.selectComment(id);
+        mav.addObject("formModel", comment);
+        mav.addObject("reportId", id);
+        mav.setViewName("/edit-comment");
+        return mav;
+    }
+
+    /*
+     * コメント編集処理
+     */
+    @PutMapping("/update-comment/{id}")
+    public ModelAndView updateComment(@PathVariable Integer id,
+                                      @ModelAttribute CommentForm comment){
+        comment.setId(id);
+        commentService.saveReport(comment);
         return new ModelAndView("redirect:/");
     }
 }

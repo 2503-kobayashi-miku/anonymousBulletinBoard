@@ -17,7 +17,7 @@
     <div class="text">
       投稿 : <span th:text="${content.content}"/>
     </div>
-    <form method="post" action="/comment/{id}(id=${content.id})" th:object="${commentFormModel}">
+    <form method="post" th:ction="@{/comment/{id}(id=${content.id})}" th:object="${commentFormModel}">
       <label>コメント内容</label>
       <textarea class="tweet-box" th:field="*{content}" size="20" maxlength="200" /></textarea><br/>
       <input type="submit" value="投稿" />

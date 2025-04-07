@@ -3,6 +3,7 @@ package com.example.forum.repository.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 
@@ -19,10 +20,13 @@ public class Comment {
     @Column
     private String content;
 
-    @Column
+    @Column(name = "report_id")
     private int reportId;
 
-    @Column
+    @Column(name = "updated_date", insertable = false,  updatable = false)
     private Date updatedDate;
+
+    @Column(name = "created_date",insertable = false, updatable = false)
+    private Date createdDate;
 
 }
