@@ -13,6 +13,13 @@
     <a href="/new">
         <button class="new-button" type="button">新規投稿</button>
     </a>
+    <form action="/">
+        日付：
+        <input name="startDate" type="date">
+        ～
+        <input name="endDate" type="date">
+        <input type="submit" value="絞り込み" />
+    </form>
     <div class="message-icon" th:each="content : ${contents}">
         <div>
             ID : <span th:text="${content.id}"/>
@@ -20,15 +27,15 @@
         <div class="text">
             投稿 : <span th:text="${content.content}"/>
         </div>
-        <div class="delete-button">
-            <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
-                <input type="submit" value="削除">
-            </form>
-        </div>
         <div class="edit-button">
             <a th:href="@{/edit/{id}(id=${content.id})}">
                 <input type="button" value="編集">
             </a>
+        </div>
+        <div class="delete-button">
+            <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
+                <input type="submit" value="削除">
+            </form>
         </div>
         <div class="comment-button">
             <form th:action="@{/comment/{id}(id=${content.id})}" th:method="get">
@@ -44,6 +51,11 @@
                     <a th:href="@{/edit-comment/{id}(id=${comment.id})}">
                         <input type="button" value="編集">
                     </a>
+                </div>
+                <div class="delete-button">
+                    <form th:action="@{/delete-comment/{id}(id=${comment.id})}" th:method="delete">
+                        <input type="submit" value="削除">
+                    </form>
                 </div>
             </div>
 

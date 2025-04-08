@@ -20,9 +20,10 @@ public class Report {
     @Column
     private String content;
 
-    @Column(name = "updated_date", insertable = false, updatable = false)
+    @Column(name = "updated_date", insertable = false)
     private Date updatedDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date",insertable = false, updatable = false)
     private Date createdDate;
 }

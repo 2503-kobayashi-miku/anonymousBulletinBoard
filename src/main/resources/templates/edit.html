@@ -10,6 +10,11 @@
     <h2>編集</h2>
 </div>
 <div class="main-contents">
+    <div class="error-messages" th:if="${session.errorMessages} != null">
+        <div th:each="errorMessage : ${session.errorMessages}">
+            <span th:text="${errorMessage}" />
+        </div>
+    </div>
     <form th:action="@{/update/{id}(id=${formModel.id})}" th:object="${formModel}" th:method="put">
         <div class="form-area">
             <label>投稿内容</label>

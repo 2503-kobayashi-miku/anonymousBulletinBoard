@@ -10,6 +10,11 @@
   <h2>コメント投稿</h2>
 </div>
 <div class="main-contents">
+  <div class="error-messages" th:if="${session.errorMessages} != null">
+    <div th:each="errorMessage : ${session.errorMessages}">
+      <span th:text="${errorMessage}" />
+    </div>
+  </div>
   <div class="form-area">
     <div>
       ID : <span th:text="${content.id}"/>

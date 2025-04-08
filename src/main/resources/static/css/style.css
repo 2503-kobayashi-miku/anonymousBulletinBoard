@@ -134,3 +134,8 @@ label {
 .comment {
     text-indent: 1em;
 }
+
+.error-messages {
+    color:red;
+    font-weight: bold;
+}

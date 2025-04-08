@@ -4,11 +4,16 @@ import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -18,18 +23,23 @@ public class ForumController {
     @Autowired
     CommentService commentService;
     private Integer reportId;
+    @Autowired
+    HttpSession session;
 
     /*
      * 投稿内容表示処理
      */
     @GetMapping
-    public ModelAndView top() {
+    public ModelAndView top(@RequestParam(name="startDate", required=false) String startDate,
+                            @RequestParam(name="endDate", required=false) String endDate) {
         ModelAndView mav = new ModelAndView();
         // 投稿を全件取得
-        List<ReportForm> contentData = reportService.findAllReport();
-        List<CommentForm> commentData = commentService.findAllComment();
+        List<ReportForm> contentData = reportService.findAllReport(startDate, endDate);
+        List<CommentForm> commentData = commentService.findAllComment(startDate, endDate);
         // 画面遷移先を指定
         mav.setViewName("/top");
+        //セッションを削除
+        session.invalidate();
         // 投稿データオブジェクトを保管
         mav.addObject("contents", contentData);
         mav.addObject("comments", commentData);
@@ -55,9 +65,21 @@ public class ForumController {
      * 新規投稿処理
      */
     @PostMapping("/add")
-    public ModelAndView addContent(@ModelAttribute("formModel") ReportForm reportForm){
+    public ModelAndView addContent(@ModelAttribute("formModel") @Validated ReportForm reportForm,
+                                   BindingResult result){
+        //バリデーション処理
+        if(result.hasErrors()){
+            List<String> errorMessages = new ArrayList<>();
+            for(FieldError error : result.getFieldErrors()){
+                errorMessages.add(error.getDefaultMessage());
+            }
+            session.setAttribute("errorMessages",errorMessages);
+            return new ModelAndView("redirect:/new");
+        }
+
         // 投稿をテーブルに格納
         reportService.saveReport(reportForm);
+
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
@@ -90,7 +112,18 @@ public class ForumController {
      * 投稿編集処理
      */
     @PutMapping("/update/{id}")
-    public ModelAndView updateContent(@ModelAttribute("formModel") ReportForm report){
+    public ModelAndView updateContent(@ModelAttribute("formModel")@Validated ReportForm report,
+                                      BindingResult result){
+        //バリデーション処理
+        if(result.hasErrors()){
+            List<String> errorMessages = new ArrayList<>();
+            for(FieldError error : result.getFieldErrors()){
+                errorMessages.add(error.getDefaultMessage());
+            }
+            session.setAttribute("errorMessages",errorMessages);
+            return new ModelAndView("redirect:/edit/{id}");
+        }
+
         reportService.saveReport(report);
         return new ModelAndView("redirect:/");
     }
@@ -120,7 +153,18 @@ public class ForumController {
      */
     @PostMapping("/comment/{id}")
     public ModelAndView addComment(@PathVariable Integer id,
-                                   @ModelAttribute("commentFormModel") CommentForm commentForm){
+                                   @ModelAttribute("commentFormModel") @Validated CommentForm commentForm,
+                                   BindingResult result){
+        //バリデーション処理
+        if(result.hasErrors()){
+            List<String> errorMessages = new ArrayList<>();
+            for(FieldError error : result.getFieldErrors()){
+                errorMessages.add(error.getDefaultMessage());
+            }
+            session.setAttribute("errorMessages",errorMessages);
+            return new ModelAndView("redirect:/new");
+        }
+
         commentForm.setReportId(id);
         // 投稿をテーブルに格納
         commentService.saveComment(commentForm);
@@ -147,9 +191,30 @@ public class ForumController {
      */
     @PutMapping("/update-comment/{id}")
     public ModelAndView updateComment(@PathVariable Integer id,
-                                      @ModelAttribute CommentForm comment){
+                                      @ModelAttribute("formModel")@Validated CommentForm comment,
+                                      BindingResult result){
+        //バリデーション処理
+        if(result.hasErrors()){
+            List<String> errorMessages = new ArrayList<>();
+            for(FieldError error : result.getFieldErrors()){
+                errorMessages.add(error.getDefaultMessage());
+            }
+            session.setAttribute("errorMessages",errorMessages);
+            return new ModelAndView("redirect:/edit-comment/{id}");
+        }
+
         comment.setId(id);
-        commentService.saveReport(comment);
+        commentService.saveComment(comment);
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * 投稿削除処理
+     */
+    @DeleteMapping("/delete-comment/{id}")
+    public ModelAndView deleteComment(@PathVariable Integer id){
+        commentService.deleteReport(id);
+
         return new ModelAndView("redirect:/");
     }
 }

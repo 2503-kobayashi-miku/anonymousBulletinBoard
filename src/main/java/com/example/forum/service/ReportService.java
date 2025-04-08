@@ -3,10 +3,14 @@ package com.example.forum.service;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.repository.ReportRepository;
 import com.example.forum.repository.entity.Report;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -17,8 +21,29 @@ public class ReportService {
     /*
      * レコード全件取得処理
      */
-    public List<ReportForm> findAllReport() {
-        List<Report> results = reportRepository.findAllByOrderByIdDesc();
+    public List<ReportForm> findAllReport(String startDate, String endDate) {
+        Date start = null;
+        Date end = null;
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            if(!StringUtils.isBlank(startDate)) {
+                startDate += " 00:00:00";
+            } else {
+                startDate = "2020-01-01 00:00:00";
+            }
+            start = sdf.parse(startDate);
+
+            if(!StringUtils.isBlank(endDate)) {
+                endDate += " 23:59:59";
+                end = sdf.parse(endDate);
+            } else {
+                end = new Date();
+            }
+        }catch (ParseException e){
+            e.printStackTrace();
+        }
+
+        List<Report> results = reportRepository.findAllByCreatdDate(start,end);
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
@@ -43,6 +68,7 @@ public class ReportService {
      */
     public void saveReport(ReportForm reqReport) {
         Report saveReport = setReportEntity(reqReport);
+        saveReport.setUpdatedDate(new Date());
         reportRepository.save(saveReport);
     }
 
